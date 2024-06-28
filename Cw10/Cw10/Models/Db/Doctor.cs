@@ -1,7 +1,6 @@
-using Cw10.Models;
+namespace Cw10.Models;
 
-public class Doctor
-{
+public class Doctor {
     public int IdDoctor { get; set; }
     public string FirstName { get; set; }
     public string LastName { get; set; }

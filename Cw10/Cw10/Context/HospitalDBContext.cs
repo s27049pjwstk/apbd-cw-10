@@ -3,47 +3,39 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Cw10.Context;
 
-public class HospitalDbContext : DbContext
-{
-    public HospitalDbContext()
-    {
+public class HospitalDbContext : DbContext {
+    public HospitalDbContext() {
     }
 
-    public HospitalDbContext(DbContextOptions options) : base(options)
-    {
+    public HospitalDbContext(DbContextOptions options) : base(options) {
     }
 
-    public DbSet<Doctor> Doctors { get; set; }
-    public DbSet<Patient> Patients { get; set; }
-    public DbSet<Medicament> Medicaments { get; set; }
+    public DbSet<Doctor?> Doctors { get; set; }
+    public DbSet<Patient?> Patients { get; set; }
+    public DbSet<Medicament?> Medicaments { get; set; }
     public DbSet<Prescription> Prescriptions { get; set; }
     public DbSet<Prescription_Medicament> PrescriptionsMedicaments { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
         optionsBuilder.UseSqlServer(
             "Data Source=db-mssql;Initial Catalog=s27049;Integrated Security=True;TrustServerCertificate=True");
     }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<Doctor>(opt =>
-        {
+    protected override void OnModelCreating(ModelBuilder modelBuilder) {
+        modelBuilder.Entity<Doctor>(opt => {
             opt.HasKey(e => e.IdDoctor);
             opt.Property(e => e.FirstName).HasMaxLength(100).IsRequired();
             opt.Property(e => e.LastName).HasMaxLength(100).IsRequired();
             opt.Property(e => e.Email).HasMaxLength(100).IsRequired();
         });
 
-        modelBuilder.Entity<Patient>(opt =>
-        {
+        modelBuilder.Entity<Patient>(opt => {
             opt.HasKey(e => e.IdPatient);
             opt.Property(e => e.FirstName).HasMaxLength(100).IsRequired();
             opt.Property(e => e.LastName).HasMaxLength(100).IsRequired();
         });
 
-        modelBuilder.Entity<Medicament>(opt =>
-        {
+        modelBuilder.Entity<Medicament>(opt => {
             opt.HasKey(e => e.IdMedicament);
             opt.Property(e => e.Name).HasMaxLength(100).IsRequired();
             opt.Property(e => e.Description).HasMaxLength(100).IsRequired();
@@ -54,8 +46,7 @@ public class HospitalDbContext : DbContext
                 .HasForeignKey(e => e.IdMedicament);
         });
 
-        modelBuilder.Entity<Prescription>(opt =>
-        {
+        modelBuilder.Entity<Prescription>(opt => {
             opt.HasKey(e => e.IdPrescription);
 
             opt.HasOne(e => e.Doctor)
@@ -71,15 +62,31 @@ public class HospitalDbContext : DbContext
                 .HasForeignKey(e => e.IdPrescription);
         });
 
-        modelBuilder.Entity<Prescription_Medicament>(opt =>
-        {
-            opt.HasKey(e => new
-            {
+        modelBuilder.Entity<Prescription_Medicament>(opt => {
+            opt.HasKey(e => new {
                 e.IdPrescription,
                 e.IdMedicament
             });
             opt.Property(e => e.Details)
                 .HasMaxLength(100).IsRequired();
         });
+    }
+
+    public async Task<Doctor?> GetDoctor(int idDoctor) {
+        return await Doctors
+            .Where(e => e.IdDoctor.Equals(idDoctor))
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task<Medicament?> GetMedicament(int idMedicament) {
+        return await Medicaments
+            .Where(e => e.IdMedicament.Equals(idMedicament))
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task<Patient?> GetPatient(int idPatient) {
+        return await Patients
+            .Where(e => e.IdPatient.Equals(idPatient))
+            .FirstOrDefaultAsync();
     }
 }
